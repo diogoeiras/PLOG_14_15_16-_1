@@ -27,7 +27,6 @@ peca([0,1,0],[0,0,0],[0,0,0]).
 */
 
 imprime_linhas(_,[]):-
-		write('|=======================================|'),
 		nl.
 
 imprime_linhas(N,[LinhaTabuleiro|RestoTabuleiro]):-
@@ -44,7 +43,7 @@ imprime_parte_peca([_|Resto],N,Pos):-
 		imprime_parte_peca(Resto,N,Pos1).
 
 imprime_linha(3,_,_):-
-		nl.	
+		write('|---------------------------------------|'),nl.	
 
 imprime_linha(N,[],Original):-
 		write('|'),
@@ -61,13 +60,11 @@ imprime_linha(N,[Peca|RestoLinha],Original):-
 		imprime_linha(N,RestoLinha,Original).
 
 imprime_tabuleiro(Tabuleiro):-
-		write('|=======================================|'),
-		nl,nl,
+		write('|---------------------------------------|'),nl,
 		imprime_linhas(0,Tabuleiro).
 
 imprime_tabuleiro_exemplo:-
-		write('|=======================================|'),
-		nl,nl,
+		write('|---------------------------------------|'),nl,
 		imprime_linhas(0,[
 		   [[[0,1,0],[0,0,0],[0,0,0]],[[1,0,0],[0,0,0],[0,0,0]],[[1,1,0],[0,0,0],[0,0,0]],[[0,1,1],[0,0,0],[0,0,0]]],
 		   [[[1,1,1],[0,0,0],[1,1,1]],[[1,0,0],[0,1,1],[0,0,0]],[[1,1,0],[0,1,1],[0,0,0]],[[0,1,1],[0,1,1],[0,0,0]]],
