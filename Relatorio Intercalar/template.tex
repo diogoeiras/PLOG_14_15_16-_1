@@ -106,35 +106,67 @@ As peças devem ser colocadas numa das àreas 4X4, de modo a que 2 peças se enc
   \caption{Exemplo de uma jogada. Do lado esquerdo a jogada é permitida, do lado direito não.}
 \end{figure}
 
-\subsection{Jogo: 1 Jogador:}
+\subsection{Modo de Jogo: 1 Jogador}
 
 Tentar completar o tabuleiro usando todas as peças.
 
-\subsection{Jogo: 2 Jogadores:}
+\subsection{Modo de Jogo: 2 Jogadores}
 
 Depois de se colocar uma peça numa das 4 àreas centrais, todas as peças estão com a face voltada para cima. À vez cada jogador pega numa peça e coloca-a em contacto com uma ou mais peças já colocadas. Perde o jogador que não conseguir jogar no seu turno.
 
-\subsection{Jogo: Mais Jogadores:}
+\subsection{Modo de Jogo: Mais Jogadores}
 
 A cada seu turno, cada jogador baralha as peças e empilha-as voltadas para cima. Pega na primeira peça e coloca-a à sua frente. A seguir pega na segunda peça e tenta encaixa-la com a anterior. E continua enquanto conseguir encaixar as peças até um máximo de 4X4 peças. Quando não conseguir pára. A sua pontuação é o seu número máximo de peças. Ganha quem tiver a maior pontuação. Se a segunda peça não encaixar na primeira, o jogador pode colocar esta no fim da pilha e usar a terceira peça.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Representação do Estado do Jogo}
 
-Descrever a forma de representação do estado do tabuleiro (tipicamente uma lista de listas), com exemplificação em Prolog de posições iniciais do jogo, posições intermédias e finais, acompanhadas de imagens ilustrativas.
-
+A representação do estado do jogo será feita com listas. As peças são listas de 3 listas com 3 inteiros cada, simbolizando os pontos a negro. O tabuleiro é uma lista de 4 listas, cada uma com 4 peças.
+\\
+\indent 
+Inicialmente o tabuleiro encontra-se vazio, e vai-se preenchendo com peças à medida que se vai jogando. A implementação inicial visa uma jogabilidade de 1vs1 ou 1vsAI.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Visualização do Tabuleiro}
 
-Descrever a forma de visualização do tabuleiro em modo de texto e o(s) predicado(s) Prolog construídos para o efeito.
-Deve ser incluída pelo menos uma imagem correspondente ao output produzido pelo predicado de visualização.
+O tabuleiro é visualizado em modo de texto sendo os seguintes predicados usados para o efeito:
 
+\subsection{imprime\_tabuleiro\_exemplo}
+Imprime no ecrã o tabuleiro exemplo.
+
+\begin{figure}[h!]
+  \centering
+      \includegraphics[width=0.5\textwidth]{exemplot}
+  \caption{Exemplo do tabuleiro imprimido. Será usada esta estratégia para imprimir o tabuleiro a cada jogada.}
+\end{figure}
+
+\subsection{imprime\_tabuleiro(Tabuleiro)}
+
+Imprime um tabuleiro no formato do tabuleiro exemplo.
+
+\subsection{imprime\_linhas(N,Tabuleiro)}
+
+Imprime as linhas do tabuleiro a partir da linha N.
+
+\subsection{imprime\_linha(N,[Peca|RestoLinha],Original)}
+
+Imprime linha recursivamente. Imprime as partes das pecas de cima para baixo.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Movimentos}
 
-Elencar os movimentos (tipos de jogadas) possíveis e definir os cabeçalhos dos predicados que serão utilizados (ainda não precisam de estar implementados).
+Os movimentos encontram-se por implementar, de notar que nem toda a abordagem inicial pode ser a mais correta nem final, mas a estratégia abordada inclui:
 
+
+\subsection{roda\_peca(Peca)}
+
+Roda uma peça a 90 graus. Pode ser aplicada mais que uma vez a fim de rodar a peça quantas vezes o jogador pretender.
+
+\subsection{joga\_peca(Jogador,PecasPorJogar,Tabuleiro)}
+
+Permite a jogada de uma peça no tabuleiro por parte do jogador.
+
+\subsection{verifica\_vencedor(Jogador,PecasPorJogar,Tabuleiro)}
+Verifica o final do jogo e indica o vencedor. Sendo que as regras dizem que o jogador que não conseguir jogar uma peça perde, poder-se-à adotar uma estratégia mais simples.
 
 \end{document}
