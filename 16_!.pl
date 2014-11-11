@@ -16,8 +16,6 @@ peca([[1,1,0],[0,0,0],[0,0,0]]).
 peca([[1,0,0],[0,0,0],[0,0,0]]). 
 peca([[0,1,0],[0,0,0],[0,0,0]]). 
 
-
-
 /*Funciona mas há aquele stresse dos parenteses*/
 joga_peca(Peca, Tabuleiro, X ,Y, Final):-
 			insere_peca(Peca, Tabuleiro, X ,Y, Final).
@@ -38,7 +36,7 @@ insere_peca_aux(Peca, [H|T], X, Y, Final, N, Y, Tabuleiro):-
 		insere_peca_aux(Peca, T, X, Y, Final_aux, N, Atual1, Tabuleiro).
 
 insere_peca_aux(Peca, [H|T], X, Y, Final, N, Atual, Tabuleiro):-
-			append(Final,H,Final_aux),
+			append(Final,[H],Final_aux),
 			Atual1 is Atual + 1,
 			insere_peca_aux(Peca, T, X, Y, Final_aux, N, Atual1, Tabuleiro).
 
@@ -49,12 +47,12 @@ insere_peca_linha(Peca, Linha, X, LinhaR):-
 insere_peca_linha_aux(_, _, _, LinhaTemp, N, N, LinhaTemp).
 
 insere_peca_linha_aux(Peca, [_|T], X ,LinhaTemp, N, X, LinhaR):-
-			append(LinhaTemp, Peca, LinhaTemp_aux),
+			append(LinhaTemp, [Peca], LinhaTemp_aux),
 			Atual1 is X + 1,
 			insere_peca_linha_aux(Peca, T, X, LinhaTemp_aux, N, Atual1, LinhaR).
 
 insere_peca_linha_aux(Peca, [H|T], X ,LinhaTemp, N, Atual, LinhaR):-
-			append(LinhaTemp,H,LinhaTemp_aux),
+			append(LinhaTemp,[H],LinhaTemp_aux),
 			Atual1 is Atual+1,
 			insere_peca_linha_aux(Peca, T, X, LinhaTemp_aux, N, Atual1, LinhaR).
 
