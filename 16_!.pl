@@ -1,5 +1,24 @@
 :- use_module(library(lists)).
-todas_pecas([[[1,1,1],[1,0,1],[1,1,1]],[[1,1,1],[1,0,0],[1,1,1]],[[1,1,1],[1,0,1],[0,1,1]],[[1,1,1],[1,0,0],[1,0,1]],[[1,1,1],[1,0,1],[0,0,0]],[[1,1,1],[0,0,1],[0,1,1]],[[1,1,1],[1,0,0],[1,1,0]],[[1,1,1],[1,0,0],[1,0,0]],[[1,1,1],[1,0,0],[0,0,0]],[[1,1,1],[0,0,1],[0,0,0]],[[1,1,1],[0,0,0],[0,0,0]],[[0,1,1],[0,0,0],[0,0,0]],[[1,1,0],[0,0,0],[0,0,0]],[[1,0,0],[0,0,0],[0,0,0]],[[0,1,0],[0,0,0],[0,0,0]]]).
+
+todas_pecas(
+	[
+		[[1,1,1],[1,0,1],[1,1,1]],
+		[[1,1,1],[1,0,0],[1,1,1]],	
+		[[1,1,1],[1,0,1],[0,1,1]],
+		[[1,1,1],[1,0,0],[1,0,1]],
+		[[1,1,1],[1,0,1],[0,0,0]],
+		[[1,1,1],[0,0,1],[0,1,1]],
+		[[1,1,1],[1,0,0],[1,1,0]],
+		[[1,1,1],[1,0,0],[1,0,0]],
+		[[1,1,1],[1,0,0],[0,0,0]],
+		[[1,1,1],[0,0,1],[0,0,0]],
+		[[1,1,1],[0,0,0],[0,0,0]],
+		[[1,1,0],[1,0,0],[0,0,0]],
+		[[0,1,1],[0,0,0],[0,0,0]],
+		[[1,1,0],[0,0,0],[0,0,0]],
+		[[1,0,0],[0,0,0],[0,0,0]],
+		[[0,1,0],[0,0,0],[0,0,0]]
+	]).
 peca([[1,1,1],[1,0,1],[1,1,1]]). 
 peca([[1,1,1],[1,0,0],[1,1,1]]). 
 peca([[1,1,1],[1,0,1],[0,1,1]]). 
@@ -53,7 +72,54 @@ jogar(1,PecasRestantes,PecasJogadas,Tabuleiro):-
 	write('Escolha a peca a jogar'),nl,
 	imprime_varias_pecas(1,PecasRestantes),
 	escolhe_peca(PecasRestantes,Peca),
-	escolhe_rodar_peca(Peca,PecaFinal).
+	append([],Peca,PecaOriginal),
+	escolhe_rodar_peca(Peca,PecaFinal),
+	write('Nova posicao da peca'),nl,
+	imprime_peca(PecaFinal),
+	escolhe_posicao_tabuleiro(Tabuleiro,X,Y),
+	insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),
+	imprime_tabuleiro(TabuleiroFinal),
+	append([PecaOriginal],PecasJogadas,NovasPecasJogadas),
+	delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),
+	write(NovasPecasJogadas),nl,
+	write(NovasPecasRestantes),nl,
+	proper_length(NovasPecasRestantes,N),write(N),
+	jogar(2,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal).
+
+jogar(N,[],_,_):-
+	write('Venceu o jogador '), write(N),nl.
+	
+jogar(2,PecasRestantes,PecasJogadas,Tabuleiro):-
+	write('Joga o jogador 2'),nl,
+	imprime_tabuleiro(Tabuleiro),
+	write('Escolha a peca a jogar'),nl,
+	imprime_varias_pecas(1,PecasRestantes),
+	escolhe_peca(PecasRestantes,Peca),
+	append([],Peca,PecaOriginal),
+	escolhe_rodar_peca(Peca,PecaFinal),
+	write('Nova posicao da peca'),nl,
+	imprime_peca(PecaFinal),
+	escolhe_posicao_tabuleiro(Tabuleiro,X,Y),
+	insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),
+	imprime_tabuleiro(TabuleiroFinal),
+	append([PecaOriginal],PecasJogadas,NovasPecasJogadas),
+	delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),
+	jogar(1,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal).
+
+opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro):-
+	proper_length(Tabuleiro,Tamanho),
+	integer(OpcaoX),
+	integer(OpcaoY),
+	OpcaoX > 0,
+	OpcaoY > 0,
+	OpcaoX =< Tamanho,
+	OpcaoY =< Tamanho.
+
+escolhe_posicao_tabuleiro(Tabuleiro,X,Y):-
+	write('Escolha a posicao onde quer inserir a peca'),nl,
+	write('Posicao X: > '), read(OpcaoX),
+	write('Posicao Y: > '), read(OpcaoY),
+	opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro)->X is OpcaoX,Y is OpcaoY;write('Opcao invalida'),nl,escolhe_posicao_tabuleiro(Tabuleiro,X,Y).
 
 opcao_valida_rodar(1).
 opcao_valida_rodar(2).
@@ -68,7 +134,7 @@ escolhe_rodar_peca(Peca,PecaFinal):-
 	write('4 - 270graus direita'),nl,
 	write('> '),
 	read(Opcao),
-	(opcao_valida_rodar(Opcao)->escolhe_rodar_peca_aux(Peca,PecaFinal,1,Opcao);escolhe_rodar_peca(Peca,PecaFinal)).
+	(opcao_valida_rodar(Opcao)->escolhe_rodar_peca_aux(Peca,PecaFinal,1,Opcao);write('Opcao invalida'),nl,escolhe_rodar_peca(Peca,PecaFinal)).
 
 escolhe_rodar_peca_aux(Peca,Peca,N,N).
 
@@ -82,7 +148,7 @@ escolhe_peca(PecasRestantes,Peca):-
 	write('> '),
 	read(Opcao),
 	proper_length(PecasRestantes,Tamanho),
-	opcao_valida_escolha_peca(Opcao, Tamanho) -> nth1(Opcao,PecasRestantes,Peca);escolhe_peca(PecasRestantes,Peca).
+	opcao_valida_escolha_peca(Opcao, Tamanho) -> nth1(Opcao,PecasRestantes,Peca);write('Opcao invalida'),nl,escolhe_peca(PecasRestantes,Peca).
 
 opcao_valida_escolha_peca(Opcao, N):-
 	integer(Opcao),
@@ -111,7 +177,6 @@ imprime_linhas(N,[LinhaTabuleiro|RestoTabuleiro]):-
 
 imprime_parte_a_imprimir([]):-
 		write('|').
-
 
 imprime_parte_a_imprimir([0]):-
 		write(' '),
