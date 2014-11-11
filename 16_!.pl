@@ -64,9 +64,13 @@ ler_opcao(Opcao):-
 iniciar_jogo(1):-
 	cria_tabuleiro(4,Tabuleiro),
 	todas_pecas(Pecas),
-	jogar(1,Pecas,[],Tabuleiro).
+	jogar(1,Pecas,[],Tabuleiro,1).
 
-jogar(1,PecasRestantes,PecasJogadas,Tabuleiro):-
+
+jogar(N,[],_,_):-
+	write('Venceu o jogador '), write(N),nl.
+
+jogar(1,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial):-
 	write('Joga o jogador 1'),nl,
 	imprime_tabuleiro(Tabuleiro),
 	write('Escolha a peca a jogar'),nl,
@@ -76,20 +80,14 @@ jogar(1,PecasRestantes,PecasJogadas,Tabuleiro):-
 	escolhe_rodar_peca(Peca,PecaFinal),
 	write('Nova posicao da peca'),nl,
 	imprime_peca(PecaFinal),
-	escolhe_posicao_tabuleiro(Tabuleiro,X,Y),
+	escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial),
 	insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),
 	imprime_tabuleiro(TabuleiroFinal),
 	append([PecaOriginal],PecasJogadas,NovasPecasJogadas),
 	delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),
-	write(NovasPecasJogadas),nl,
-	write(NovasPecasRestantes),nl,
-	proper_length(NovasPecasRestantes,N),write(N),
-	jogar(2,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal).
+	jogar(2,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0).
 
-jogar(N,[],_,_):-
-	write('Venceu o jogador '), write(N),nl.
-	
-jogar(2,PecasRestantes,PecasJogadas,Tabuleiro):-
+jogar(2,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial):-
 	write('Joga o jogador 2'),nl,
 	imprime_tabuleiro(Tabuleiro),
 	write('Escolha a peca a jogar'),nl,
@@ -99,27 +97,41 @@ jogar(2,PecasRestantes,PecasJogadas,Tabuleiro):-
 	escolhe_rodar_peca(Peca,PecaFinal),
 	write('Nova posicao da peca'),nl,
 	imprime_peca(PecaFinal),
-	escolhe_posicao_tabuleiro(Tabuleiro,X,Y),
+	escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial),
 	insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),
 	imprime_tabuleiro(TabuleiroFinal),
 	append([PecaOriginal],PecasJogadas,NovasPecasJogadas),
 	delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),
-	jogar(1,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal).
+	jogar(1,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0).
 
-opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro):-
+opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro,1):-
+	proper_length(Tabuleiro,Tamanho),
+	Meio is Tamanho//2,
+	integer(OpcaoX),
+	integer(OpcaoY),
+	OpcaoX > Meio - 1,
+	OpcaoY > Meio - 1,
+	OpcaoX =< Meio + 1,
+	OpcaoY =< Meio + 1.
+
+opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro,0):-
 	proper_length(Tabuleiro,Tamanho),
 	integer(OpcaoX),
 	integer(OpcaoY),
 	OpcaoX > 0,
 	OpcaoY > 0,
 	OpcaoX =< Tamanho,
-	OpcaoY =< Tamanho.
+	OpcaoY =< Tamanho,
+	Valor is OpcaoY * 4,
+	Valor2 is OpcaoX + Valor,
+	nth1(OpcaoY, Tabuleiro, L),
+	nth1(OpcaoX, L, [[0,0,0],[0,0,0],[0,0,0]]).
 
-escolhe_posicao_tabuleiro(Tabuleiro,X,Y):-
+escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial):-
 	write('Escolha a posicao onde quer inserir a peca'),nl,
 	write('Posicao X: > '), read(OpcaoX),
 	write('Posicao Y: > '), read(OpcaoY),
-	opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro)->X is OpcaoX,Y is OpcaoY;write('Opcao invalida'),nl,escolhe_posicao_tabuleiro(Tabuleiro,X,Y).
+	opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro,JogadaInicial)->X is OpcaoX,Y is OpcaoY;write('Opcao invalida'),nl,escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial).
 
 opcao_valida_rodar(1).
 opcao_valida_rodar(2).
@@ -379,10 +391,6 @@ verifica_jogada_aux(1, [H|T], N, SideLine, SideLineF):-
 	N1 is N-1,
 	verifica_jogada_aux(1, T, N1, SideLineA, SideLineF).
 
-
-/*Acho que ja esta a funcao de criar tabuleiro! Testei ...*/
-
-
 cria_tabuleiro(N, Tabuleiro):-                               
 			N >= 4,
 			N1 is N mod 4,
@@ -391,6 +399,7 @@ cria_tabuleiro(N, Tabuleiro):-
 			cria_tabuleiro_aux(Ciclo, N, [], Tabuleiro).
 
 cria_tabuleiro_aux(0, _, Tabuleiro, Tabuleiro).
+
 cria_tabuleiro_aux(Ciclo, N, TabuleiroTemp, Tabuleiro):-
 			cria_linha(N, [], Linha),
 			append(TabuleiroTemp, [Linha], TabuleiroTempA),
