@@ -51,19 +51,56 @@ jogar(1,PecasRestantes,PecasJogadas,Tabuleiro):-
 	write('Joga o jogador 1'),nl,
 	imprime_tabuleiro(Tabuleiro),
 	write('Escolha a peca a jogar'),nl,
-	imprime_varias_pecas(1,PecasRestantes).
-	
+	imprime_varias_pecas(1,PecasRestantes),
+	escolhe_peca(PecasRestantes,Peca),
+	escolhe_rodar_peca(Peca,PecaFinal).
+
+opcao_valida_rodar(1).
+opcao_valida_rodar(2).
+opcao_valida_rodar(3).
+opcao_valida_rodar(4).
+
+escolhe_rodar_peca(Peca,PecaFinal):-
+	write('Pretende rodar a peca?'),nl,
+	write('1 -              Nao'),nl,
+	write('2 -  90graus direita'),nl,
+	write('3 - 180graus direita'),nl,
+	write('4 - 270graus direita'),nl,
+	write('> '),
+	read(Opcao),
+	(opcao_valida_rodar(Opcao)->escolhe_rodar_peca_aux(Peca,PecaFinal,1,Opcao);escolhe_rodar_peca(Peca,PecaFinal)).
+
+escolhe_rodar_peca_aux(Peca,Peca,N,N).
+
+escolhe_rodar_peca_aux(Peca,PecaFinal,Atual,Fim):-
+	rodar_peca_direita(Peca,P),
+	Next is Atual + 1,
+	escolhe_rodar_peca_aux(P,PecaFinal,Next,Fim).
+
+escolhe_peca(PecasRestantes,Peca):-
+	write('Escolha a peca'),nl,
+	write('> '),
+	read(Opcao),
+	proper_length(PecasRestantes,Tamanho),
+	opcao_valida_escolha_peca(Opcao, Tamanho) -> nth1(Opcao,PecasRestantes,Peca);escolhe_peca(PecasRestantes,Peca).
+
+opcao_valida_escolha_peca(Opcao, N):-
+	integer(Opcao),
+	Opcao > 0,
+	Opcao =< N.
+
 imprime_varias_pecas(_,[]).
 
 imprime_varias_pecas(N,[H|T]):-
 	write(N),
-	write(':-'),nl,
-	write('|'),imprime_parte_peca(H,0,0),nl,
-	write('|'),imprime_parte_peca(H,1,0),nl,
-	write('|'),imprime_parte_peca(H,2,0),nl,nl,
+	write(':-'),nl,imprime_peca(H),nl,
 	Next is N + 1,
 	imprime_varias_pecas(Next,T).
 
+imprime_peca(Peca):-
+	write('|'),imprime_parte_peca(Peca,0,0),nl,
+	write('|'),imprime_parte_peca(Peca,1,0),nl,
+	write('|'),imprime_parte_peca(Peca,2,0),nl.
 
 imprime_linhas(_,[]).
 
