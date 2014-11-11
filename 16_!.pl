@@ -73,38 +73,52 @@ iniciar_jogo(1):-
 jogar(N,[],_,_):-
 	write('Venceu o jogador '), write(N),nl.
 
+opcao_desistir(1).
+opcao_desistir(2).
+
+desistir(Opcao):-
+	write('Pretende desistir?'),nl,
+	write('1.             sim'),nl,
+	write('2.             nao'),nl,
+	write('> '), read(OpcaoAux),
+	opcao_desistir(OpcaoAux)-> Opcao is OpcaoAux;write('Opcao invalida'),nl,desistir(opcao).
+
 jogar(1,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial):-
 	write('Joga o jogador 1'),nl,
 	imprime_tabuleiro(Tabuleiro),
-	write('Escolha a peca a jogar'),nl,
 	imprime_varias_pecas(1,PecasRestantes),
+	desistir(Opcao),
+	(Opcao = 1 -> write('Jogador 2 venceu!'),!,halt;!),
 	escolhe_peca(PecasRestantes,Peca),
 	append([],Peca,PecaOriginal),
 	escolhe_rodar_peca(Peca,PecaFinal),
 	write('Nova posicao da peca'),nl,
 	imprime_peca(PecaFinal),
 	escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial),
-	(jogada_valida(Peca,X,Y,Tabuleiro)->insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),imprime_tabuleiro(TabuleiroFinal),append([PecaOriginal],PecasJogadas,NovasPecasJogadas),delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),jogar(2,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0);write('Jogada invalida'),nl,jogar(1,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial)).
+	(jogada_valida(PecaFinal,X,Y,Tabuleiro,JogadaInicial)->insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),imprime_tabuleiro(TabuleiroFinal),append([PecaOriginal],PecasJogadas,NovasPecasJogadas),delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),jogar(2,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0);write('Jogada invalida'),nl,jogar(1,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial)).
 
 jogar(2,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial):-
 	write('Joga o jogador 2'),nl,
 	imprime_tabuleiro(Tabuleiro),
-	write('Escolha a peca a jogar'),nl,
 	imprime_varias_pecas(1,PecasRestantes),
+	desistir(Opcao),
+	(Opcao = 1 -> write('Jogador 2 venceu!'),!,halt;!),
 	escolhe_peca(PecasRestantes,Peca),
 	append([],Peca,PecaOriginal),
 	escolhe_rodar_peca(Peca,PecaFinal),
 	write('Nova posicao da peca'),nl,
 	imprime_peca(PecaFinal),
 	escolhe_posicao_tabuleiro(Tabuleiro,X,Y,JogadaInicial),
-	(jogada_valida(Peca,X,Y,Tabuleiro)->insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),imprime_tabuleiro(TabuleiroFinal),append([PecaOriginal],PecasJogadas,NovasPecasJogadas),delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),jogar(1,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0);write('Jogada invalida'),nl,jogar(2,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial)).
+	(jogada_valida(PecaFinal,X,Y,Tabuleiro,JogadaInicial)->insere_peca(PecaFinal,Tabuleiro,X,Y,TabuleiroFinal),imprime_tabuleiro(TabuleiroFinal),append([PecaOriginal],PecasJogadas,NovasPecasJogadas),delete(PecasRestantes,PecaOriginal,NovasPecasRestantes),jogar(1,NovasPecasRestantes,NovasPecasJogadas,TabuleiroFinal,0);write('Jogada invalida'),nl,jogar(2,PecasRestantes,PecasJogadas,Tabuleiro,JogadaInicial)).
 
 lado_igual([],[]).
 lado_igual([H|T],[H2|T2]):-
 	H = H2,
 	lado_igual(T,T2).
 
-jogada_valida(Peca,X,Y,Tabuleiro):-
+jogada_valida(Peca,X,Y,Tabuleiro,1).
+
+jogada_valida(Peca,X,Y,Tabuleiro,0):-
 	Left is X-1,
 	Right is X+1,
 	Up is Y-1,
@@ -118,10 +132,12 @@ jogada_valida(Peca,X,Y,Tabuleiro):-
 	verifica_peca(Peca,3,PecaLadoDireito),
 	verifica_peca(Peca,2,PecaLadoCima),
 	verifica_peca(Peca,4,PecaLadoBaixo),
-	(lado_igual(PecaEsquerdaLado,PecaLadoEsquerdo)->!;lado_igual(PecaEsquerdaLado,[0,0,0])),
-	(lado_igual(PecaDireitaLado,PecaLadoDireito)->!;lado_igual(PecaDireitaLado,[0,0,0])),
-	(lado_igual(PecaCimaLado,PecaLadoCima)->!;lado_igual(PecaCimaLado,[0,0,0])),
-	(lado_igual(PecaBaixoLado,PecaLadoBaixo)->!;lado_igual(PecaBaixoLado,[0,0,0])).
+	Counter is 0,
+	(lado_igual(PecaEsquerdaLado,PecaLadoEsquerdo)->Counter2 is Counter + 1;lado_igual(PecaEsquerdaLado,[0,0,0]),Counter2 is Counter),
+	(lado_igual(PecaDireitaLado,PecaLadoDireito)->Counter3 is Counter2 + 1;lado_igual(PecaDireitaLado,[0,0,0]),Counter3 is Counter2),
+	(lado_igual(PecaCimaLado,PecaLadoCima)->Counter4 is Counter3 + 1;lado_igual(PecaCimaLado,[0,0,0]),Counter4 is Counter3),
+	(lado_igual(PecaBaixoLado,PecaLadoBaixo)->Counter5 is Counter4 + 1;lado_igual(PecaBaixoLado,[0,0,0]),Counter5 is Counter4),
+	Counter5 > 0.
 
 opcao_valida_posicao(OpcaoX,OpcaoY,Tabuleiro,1):-
 	proper_length(Tabuleiro,Tamanho),
