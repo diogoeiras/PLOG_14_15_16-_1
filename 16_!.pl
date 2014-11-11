@@ -19,6 +19,7 @@ todas_pecas(
 		[[1,0,0],[0,0,0],[0,0,0]],
 		[[0,1,0],[0,0,0],[0,0,0]]
 	]).
+
 peca([[1,1,1],[1,0,1],[1,1,1]]). 
 peca([[1,1,1],[1,0,0],[1,1,1]]). 
 peca([[1,1,1],[1,0,1],[0,1,1]]). 
@@ -52,6 +53,19 @@ imprime_opcoes:-
 	write('|2 -                   sair|'),
 	nl.
 
+tamanho_valido(Tamanho):-
+	integer(Tamanho),
+	Tamanho2 is Tamanho*Tamanho,
+	Valor is Tamanho2 mod 16,
+	Valor = 0.
+
+ler_tamanho(Tamanho):-
+	write('Escolha o tamanho do tabuleiro (NxN)'),nl,
+	write('O numero de casas tem de ser multiplo de 16'),nl,
+	write('> '),
+	read(TamanhoAux),
+	(tamanho_valido(TamanhoAux)->Tamanho is TamanhoAux;ler_tamanho(Tamanho)).
+
 opcao_valida_menu(1).
 
 ler_opcao(Opcao):-
@@ -66,9 +80,23 @@ iniciar_jogo(2).
 
 /* Jogador vs Jogador */
 iniciar_jogo(1):-
-	cria_tabuleiro(4,Tabuleiro),
-	todas_pecas(Pecas),
+	ler_tamanho(Tamanho),
+	cria_tabuleiro(Tamanho,Tabuleiro),
+	adicionar_pecas(Tamanho,Pecas),
 	jogar(1,Pecas,[],Tabuleiro,1).
+
+adicionar_pecas_aux(Pecas,Pecas,0).
+
+adicionar_pecas_aux(Pecas,PecasAux,N):-
+	todas_pecas(PecasAdicionar),
+	append(PecasAux,PecasAdicionar,P),
+	N2 is N-1,
+	adicionar_pecas_aux(Pecas,P,N2).
+
+adicionar_pecas(Tamanho,Pecas):-
+	NPecas is Tamanho*Tamanho,
+	N is NPecas // 16,
+	adicionar_pecas_aux(Pecas,[],N).
 
 jogar(N,[],_,_):-
 	write('Venceu o jogador '), write(N),nl.
